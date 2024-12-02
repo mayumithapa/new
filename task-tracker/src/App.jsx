@@ -9,11 +9,20 @@ function App() {
 
   // Fetch tasks from backend
   useEffect(() => {
-    fetch('http://localhost:5000/tasks')
-      .then((response) => response.json())
-      // console.log(response)
-      .then((data) => setTasks(data));
-      // console.log(data)
+    const fetchTasks = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/tasks');
+        if (!response.ok) {
+          throw new Error('Failed to fetch tasks');
+        }
+        const data = await response.json();
+        setTasks(data);
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    };
+
+    fetchTasks();
   }, []);
 
   // Handle form input changes
@@ -25,21 +34,26 @@ function App() {
     }));
   };
 
-  // Handle form submission to add new task
-  const handleSubmit = (e) => {
+  // Handle form submission to add a new task
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    fetch('http://localhost:5000/tasks', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newTask),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setTasks((prevTasks) => [...prevTasks, data]);
-        setNewTask({ title: '', description: '' }); // Reset form
+    try {
+      const response = await fetch('http://localhost:5000/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newTask),
       });
+      if (!response.ok) {
+        throw new Error('Failed to add task');
+      }
+      const data = await response.json();
+      setTasks((prevTasks) => [...prevTasks, data]);
+      setNewTask({ title: '', description: '' }); // Reset form
+    } catch (error) {
+      console.error('Error adding task:', error);
+    }
   };
 
   return (

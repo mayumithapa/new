@@ -13,7 +13,9 @@ let tasks = [];
 let lastId = 0;
 
 // API Routes
-
+app.get('/', (req, res) => {
+  res.send("TASKS")
+});
 // Get all tasks
 app.get('/tasks', (req, res) => {
   res.json(tasks);
